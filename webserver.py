@@ -15,7 +15,7 @@ def load_models(conf_file):
     for url in urlmapping.keys():
         model_file = urlmapping[url]
         mf = open(model_file,"r")
-        models[url] = pickle.load(mf)
+        models[url] = (pickle.load(mf),model_file)
         mf.close()
     cf.close()
     return models

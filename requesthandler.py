@@ -24,7 +24,8 @@ class  RequestHandler(BaseHTTPRequestHandler):
         if self.path == "/stats":
             resp = {'started_at':str(self.server.started_at)}
             for url in self.server.models.keys():
-                resp[url] = self.server.stats[url]
+                model,filename = self.server.models[url]
+                resp[url] = (self.server.stats[url],filename)
             response = json.dumps(resp)
             self.wfile.write(response.encode("utf-8"))
         elif self.path == "/loadModelAtURL":
@@ -45,7 +46,7 @@ class  RequestHandler(BaseHTTPRequestHandler):
             if self.path == url:
                 self.server.stats[url] += 1
                 model_found = True
-                model = self.server.models[url]
+                model,filename = self.server.models[url]
                 data = self.read_POST_data()
                 data = pd.read_json(data)
                 prediction = model.transform_predict(data)
