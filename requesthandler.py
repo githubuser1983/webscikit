@@ -2,8 +2,10 @@ import sys,csv,math
 sys.path.insert(1,'/usr/local/lib/python2.7/dist-packages/')
 
 from BaseHTTPServer import BaseHTTPRequestHandler
-import logging, json
+import logging, json, pickle
 import pandas as pd
+from urlparse import parse_qs
+
 
 class  RequestHandler(BaseHTTPRequestHandler): 
 
@@ -28,11 +30,16 @@ class  RequestHandler(BaseHTTPRequestHandler):
                 resp[url] = (self.server.stats[url],filename)
             response = json.dumps(resp)
             self.wfile.write(response.encode("utf-8"))
-        elif self.path == "/loadModelAtURL":
-            url = getRequestParam("url")
-            model_file = getRequestParam("model")
-            model = self.load_model(model_file)
-            self.models[url] = model
+        elif "/loadModelAtURL" in self.path:
+            query = self.path.replace("/loadModelAtURL?","")
+            params = parse_qs(query)
+            print params
+            url = params["url"][0]
+            model_file = params["model"][0]
+            f = open(model_file,"r")
+            model = pickle.load(f)
+            f.close()
+            self.server.models[url] = (model,model_file)
         else:
             # 404
             pass
