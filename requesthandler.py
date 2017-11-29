@@ -7,6 +7,7 @@ import pandas as pd
 
 class  RequestHandler(BaseHTTPRequestHandler): 
 
+         
     def read_POST_data(self):
         content_length = int(self.headers['Content-Length']) # <--- Gets the size of data
         post_data = self.rfile.read(content_length).decode("utf-8")
@@ -19,18 +20,21 @@ class  RequestHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         """ GET is reserved for "/stats" and "/loadModelAtURL?url=url10;model=model10.pkl"""
+        self._set_headers()
         if self.path == "/stats":
-            print( """ Requests : 123
-                   started_at : Datetime
-                   Requests for url1 : 100
-                   Requests for url2 :  20
-                   Requests for url3 :   3 """)
-
-        if self.path == "/loadModelAtURL":
+            resp = {'started_at':str(self.server.started_at)}
+            for url in self.server.models.keys():
+                resp[url] = self.server.stats[url]
+            response = json.dumps(resp)
+            self.wfile.write(response.encode("utf-8"))
+        elif self.path == "/loadModelAtURL":
             url = getRequestParam("url")
             model_file = getRequestParam("model")
             model = self.load_model(model_file)
             self.models[url] = model
+        else:
+            # 404
+            pass
 
 
     def do_POST(self):
@@ -39,6 +43,7 @@ class  RequestHandler(BaseHTTPRequestHandler):
         model_found = False
         for url in self.server.models.keys():
             if self.path == url:
+                self.server.stats[url] += 1
                 model_found = True
                 model = self.server.models[url]
                 data = self.read_POST_data()

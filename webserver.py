@@ -24,6 +24,7 @@ def runServerWithModels(models,server_class=HTTPServer, handler_class=RequestHan
     httpd = server_class(server_address, handler_class)
     httpd.models = models
     httpd.started_at = datetime.datetime.now()
+    httpd.stats = dict([ (url,0) for url in models.keys() ])
     httpd.serve_forever()
 
 if __name__ == '__main__':
