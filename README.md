@@ -9,8 +9,11 @@ The server can handle multiple models. The models and urls are registered at web
 If you want to adapt it, see the following:
 
 models.py
+
 fit_boston.py
+
 fit_iris.py
+
 webscikit.conf
 
 
@@ -20,4 +23,4 @@ If you wan to run the examples:
  
 ./example_requests/curl_boston.sh
 
-./example_requests/bash curl_iris.sh
+./example_requests/curl_iris.sh
