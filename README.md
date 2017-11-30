@@ -16,7 +16,8 @@ webscikit.conf
 
 If you wan to run the examples:
 
-python webserver.py
+ python webserver.py
+ 
+./example_requests/curl_boston.sh
 
-bash curl_boston.sh
-bash curl_iris.sh
+./example_requests/bash curl_iris.sh
