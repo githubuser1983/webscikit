@@ -27,6 +27,8 @@ class  RequestHandler(BaseHTTPRequestHandler):
             resp = {'started_at':str(self.server.started_at)}
             for url in self.server.models.keys():
                 model,filename = self.server.models[url]
+                if not self.server.stats.has_key(url):
+                    self.server.stats[url] = 0
                 resp[url] = (self.server.stats[url],filename)
             response = json.dumps(resp)
             self.wfile.write(response.encode("utf-8"))
