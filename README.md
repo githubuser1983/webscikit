@@ -21,6 +21,8 @@ If you wan to run the examples:
 
  python webserver.py
  
-./example_requests/curl_boston.sh
+cd /example_requests/
 
-./example_requests/curl_iris.sh
+./curl_boston.sh
+
+./curl_iris.sh
