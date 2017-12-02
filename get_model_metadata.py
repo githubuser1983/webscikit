@@ -2,10 +2,9 @@
 import sys,csv,math
 sys.path.insert(1,'/usr/local/lib/python2.7/dist-packages/')
 import sys, pickle, joblib
+from utils import load
 
 if __name__=="__main__":
     model_file_name = sys.argv[1]
-    model_file = open(model_file_name,"r")
-    model = pickle.load(model_file)
-    model_file.close()
+    model = load(model_file_name)
     print model.metadata

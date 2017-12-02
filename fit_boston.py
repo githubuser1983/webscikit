@@ -5,6 +5,7 @@ sys.path.insert(1,'/usr/local/lib/python2.7/dist-packages/')
 
 from models import BostonModel
 from sklearn.datasets import load_boston
+from utils import save
 
 # Load scikit's random forest classifier library
 from sklearn.ensemble import RandomForestRegressor
@@ -36,6 +37,4 @@ print bostonmodel.metadata
 
 print df.loc[0:2,:].to_json()
 
-bostonmodel_file = open("bostonmodel.pkl","w")
-pickle.dump(bostonmodel, bostonmodel_file)
-bostonmodel_file.close()
+save(bostonmodel, "bostonmodel.pkl")

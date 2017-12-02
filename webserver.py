@@ -5,7 +5,7 @@ sys.path.insert(1,'/usr/local/lib/python2.7/dist-packages/')
 import json, pickle, datetime
 from BaseHTTPServer import HTTPServer
 from requesthandler import RequestHandler
-
+from utils import load
 
 def load_models(conf_file):
     models = dict([])
@@ -14,9 +14,7 @@ def load_models(conf_file):
     urlmapping = json.loads(jsonstring)
     for url in urlmapping.keys():
         model_file = urlmapping[url]
-        mf = open(model_file,"r")
-        models[url] = (pickle.load(mf),model_file)
-        mf.close()
+        models[url] = (load(model_file),model_file)
     cf.close()
     return models
 
@@ -29,6 +27,6 @@ def runServerWithModels(models,server_class=HTTPServer, handler_class=RequestHan
 
 if __name__ == '__main__':
     models = load_models("webscikit.conf")
-    runServerWithModels(models, server_address = ('',8123))
+    runServerWithModels(models)
 
    

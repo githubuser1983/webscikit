@@ -2,7 +2,7 @@ import sys,csv,math
 sys.path.insert(1,'/usr/local/lib/python2.7/dist-packages/')
 
 from BaseHTTPServer import BaseHTTPRequestHandler
-import logging, json, pickle
+import logging, json
 import pandas as pd
 from urlparse import parse_qs
 
@@ -67,7 +67,7 @@ class  RequestHandler(BaseHTTPRequestHandler):
                 self._set_headers()
                 self.wfile.write(response.encode("utf-8"))
                 self.wfile.close()
-            if not model_found:
-                # 404 model not found
-                self.send_error(404)
-                self.wfile.close()
+        if not model_found:
+            # 404 model not found
+            self.send_error(404)
+            self.wfile.close()

@@ -5,6 +5,7 @@ sys.path.insert(1,'/usr/local/lib/python2.7/dist-packages/')
 
 from models import IrisModel
 from sklearn.datasets import load_iris
+from utils import save
 
 # Load scikit's random forest classifier library
 from sklearn.ensemble import RandomForestClassifier
@@ -38,6 +39,4 @@ print irismodel.metadata
 
 print df.loc[0:2,:].to_json()
 
-irismodel_file = open("irismodel.pkl","w")
-pickle.dump(irismodel, irismodel_file)
-irismodel_file.close()
+save(irismodel, "irismodel.pkl")
