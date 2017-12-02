@@ -5,7 +5,7 @@ from BaseHTTPServer import BaseHTTPRequestHandler
 import logging, json
 import pandas as pd
 from urlparse import parse_qs
-
+from utils import load
 
 class  RequestHandler(BaseHTTPRequestHandler): 
 
@@ -39,9 +39,7 @@ class  RequestHandler(BaseHTTPRequestHandler):
             print params
             url = params["url"][0]
             model_file = params["model"][0]
-            f = open(model_file,"r")
-            model = pickle.load(f)
-            f.close()
+            model = load(model_file)
             self.server.models[url] = (model,model_file)
             self._set_headers(200)
             self.wfile.close()
