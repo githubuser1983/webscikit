@@ -11,18 +11,17 @@ class  RequestHandler(BaseHTTPRequestHandler):
 
          
     def read_POST_data(self):
-        content_length = int(self.headers['Content-Length']) # <--- Gets the size of data
+        content_length = int(self.headers['Content-Length']) # 
         post_data = self.rfile.read(content_length).decode("utf-8")
         return post_data
 
-    def _set_headers(self):       
-        self.send_response(200)
+    def _set_headers(self,httpstatus=200):       
+        self.send_response(httpstatus)
         self.send_header('Content-type', 'application/json')
         self.end_headers()
 
     def do_GET(self):
         """ GET is reserved for "/stats" and "/loadModelAtURL?url=url10;model=model10.pkl"""
-        self._set_headers()
         if self.path == "/stats":
             resp = {'started_at':str(self.server.started_at)}
             for url in self.server.models.keys():
@@ -31,7 +30,9 @@ class  RequestHandler(BaseHTTPRequestHandler):
                     self.server.stats[url] = 0
                 resp[url] = (self.server.stats[url],filename)
             response = json.dumps(resp)
+            self._set_headers()
             self.wfile.write(response.encode("utf-8"))
+            self.wfile.close()
         elif "/loadModelAtURL" in self.path:
             query = self.path.replace("/loadModelAtURL?","")
             params = parse_qs(query)
@@ -42,14 +43,16 @@ class  RequestHandler(BaseHTTPRequestHandler):
             model = pickle.load(f)
             f.close()
             self.server.models[url] = (model,model_file)
+            self._set_headers(200)
+            self.wfile.close()
         else:
             # 404
-            pass
+            self.send_error(404)
+            self.wfile.close()
 
 
     def do_POST(self):
         """ POST is reserved for doing only model predictions at urls defined in webscikit.conf"""
-        self._set_headers()
         model_found = False
         for url in self.server.models.keys():
             if self.path == url:
@@ -61,6 +64,10 @@ class  RequestHandler(BaseHTTPRequestHandler):
                 prediction = model.transform_predict(data)
                 json_prediction = prediction.to_json()
                 response = json.dumps(json_prediction)
+                self._set_headers()
                 self.wfile.write(response.encode("utf-8"))
+                self.wfile.close()
             if not model_found:
-                pass
+                # 404 model not found
+                self.send_error(404)
+                self.wfile.close()
