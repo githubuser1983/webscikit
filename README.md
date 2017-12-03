@@ -3,8 +3,17 @@ Webscikit is a set of tools to run a HTTPServer as a JSON Webservice for scikit-
 
 It is work in progress, so it comes with no guarantee.
 
-The server can handle multiple models. The models and urls are registered at webscikit.conf .
+Features:
 
+  * The server can handle multiple models. The models and urls are registered at webscikit.conf .
+
+  * Multiple data-scientist could work locally on their own models, and then later deploy their model to the server.
+  
+  * The models can be deployed when the server is online.
+  
+  * Each model can save additional metadata needed to transform and predict new data.
+  
+  * You can easily start a new project with create_project.py newProjectName
 
 If you wan to run the examples:
 
