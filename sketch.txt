@@ -1,99 +1,21 @@
-* models.py
-    MyModel(WebModel):
-     def predict(data):
-        do some computation here based on metdata and return prediction as numpy.array
-     def transform(data):
-        if necessary transform data, return pandas.DataFrame, otherwise do not implement transform
-
-* fit_model.py -> model.pkl
-    from models import MyModel
-    metadata = {..}
-    model = MyModel(metadata)
-    cpickle.dump(model,"model.pkl")
-
-* get_model_metadata.py model.pkl
-    metadata will be shown on stdout as json
+env vars:
+  WEBSCIKITMODELSPATH = /home/orges/models
 
 
-class WebModel(object,metadata):
-   self.metadata = dict
-   created_at = datetime.datetime.now()
+webscikit -create iris
+  iris/
+     irismodel.py class IrisModel(object):
+     fit_iris.py
 
-   def predict(X):
-      return X[:0]
+webscikit -deploy iris -overwrite
+  copies irismodel.py to WEBSCIKITMODELATH
+  gzips-pickles IrisModel and copies irismodel.pkl to WEBSCIKITMODELPATH
+  if iris exists in WEBSCIKITMODELPATH then it is overwritten
+  uploads models iris at url /iris on webserver
 
-   def transform(X):
-      return X
+/etc/init.d/webscikit.sh
+  start stop restart status
 
-   def transform_predict(X):
-      return self.predict(self.transform(X))
+irismodel.py should import only from PYTHONPATH otherwise pickling will not work
+   check_model.py -> raises an ImportError if unpickling does not work
 
-metadata can hold Estimators from Scikit-Learn, additional data as pandas.DataFrame, metrics about the model, version of model etc.
-
-
-* don't use WebModel directly, instead subclass it
-
-* webscikit.conf:
-    JSON File / Python dictionary:
-    { "/url1" : "path/to/model1.pkl", "/url2" : "path/to/model2.pkl", ..., "/urlN": "/path/to/modelN.pkl" }
-
-* server.py
-
-     def load_models(conf_file):
-         models = dict([])
-         urlmapping = json.loads(conf_file)
-         for url in urlmapping.keys():
-             model_file = urlmapping[url]
-             models[url] = cpickle.load(model_file)
-         return models
-
-     if __name__ == '__main__':
-         models = load_models(webscikit.conf)
-         runServerWithModels(models, server_address = ('',8000))
-
-     def runServerWithModels(models=models,server_class=HTTPServer, handler_class=RequestHandler, server_address=('',8000)):
-         httpd = server_class(server_address, handler_class)
-         httpd.models = models
-         httpd.started_at = datetime.datetime.now()
-         httpd.serve_forever()
-       
-   
-     RequestHandler(BaseHTTPRequestHandler): 
-
-        read_POST_data_as_json(self):
-           content_length = int(self.headers['Content-Length']) # <--- Gets the size of data
-           post_data = self.rfile.read(content_length).decode("utf-8")
-           j = json.loads(post_data)
-           return j
-       
-        do_GET(self):
-        """ GET is reserved for "/stats" and "/loadModelAtURL?url=url10;model=model10.pkl"""
-         if self.path == "/stats":
-             print Requests : 123
-                   started_at : Datetime
-                   Requests for url1 : 100
-                   Requests for url2 :  20
-                   Requests for url3 :   3
-
-         if self.path == "/loadModelAtURL":
-             url = getRequestParam("url")
-             model_file = getRequestParam("model")
-             model = self.load_model(model_file)
-             self.models[url] = model
-
-
-        do_POST(self):
-        """ POST is reserved for doing only model predictions at urls defined in webscikit.conf"""
-            model_found = False
-            for url in self.server.models.keys():
-                if self.path == url:
-                    model_found = True
-                    model = self.models[url]
-                    data = self.read_POST_data_as_json()
-                    data = self.convert_to_data_frame(data)
-                    prediction = model.transform_predict(data)
-                    json_prediction = self.convert_to_json(prediction)
-                    response = json.dumps(json_prediction)
-                    self.wfile.write(response.encode("utf-8"))
-            if not model_found:
-                HTTP-ERROR 404

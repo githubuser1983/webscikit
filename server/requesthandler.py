@@ -1,11 +1,18 @@
-import sys,csv,math
+import sys
 sys.path.insert(1,'/usr/local/lib/python2.7/dist-packages/')
 
 from BaseHTTPServer import BaseHTTPRequestHandler
 import logging, json
-import pandas as pd
+import pandas as pd, os, cPickle as pickle, gzip
 from urlparse import parse_qs
-from utils import load
+
+def load(filename):
+    """Loads a compressed object from disk
+    """
+    file = gzip.GzipFile(filename, 'rb')
+    object = pickle.load(file)
+    file.close()
+    return object
 
 class  RequestHandler(BaseHTTPRequestHandler): 
 
@@ -39,7 +46,7 @@ class  RequestHandler(BaseHTTPRequestHandler):
             print params
             url = params["url"][0]
             model_file = params["model"][0]
-            model = load(model_file)
+            model = load(os.path.join(self.server.webscikitmodelspath+"/",model_file))
             self.server.models[url] = (model,model_file)
             self._set_headers(200)
             self.wfile.close()

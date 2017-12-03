@@ -1,17 +1,13 @@
 import sys,csv,math
 sys.path.insert(1,'/usr/local/lib/python2.7/dist-packages/')
-import pandas as pd
-
-from webmodel import WebModel
-
-class BostonModel(WebModel):
-    def predict(self,data):
-        rf = self.metadata["RFEstimator"]       
-        prediction = rf.predict(data)
-        return pd.DataFrame(prediction)
+import pandas as pd, datetime
 
 
-class IrisModel(WebModel):
+class IrisModel(object):
+    def __init__(self,metadata):
+        self.created_at = datetime.datetime.now()
+        self.metadata = metadata
+
     def predict(self,data):
         rf = self.metadata["RFClassifier"]       
         prediction = rf.predict(data)
